@@ -1,6 +1,6 @@
 <template>
   <div>
-    
+
     <br>
       <v-select
         v-model="pilihOrgs"
@@ -34,6 +34,18 @@
         >
           Load More
         </v-btn>
+        <v-spacer></v-spacer>
+        <download-excel
+          v-if="!organization.membersWithRole.pageInfo.hasNextPage"
+          :data="json_data"
+          :fields="json_fields"
+          worksheet="My Worksheet"
+          :name="`${pilihOrgs}.xls`"
+        >
+          <v-btn>
+            download
+          </v-btn>
+        </download-excel>
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
@@ -88,6 +100,10 @@ export default {
         }
       },
 
+      result ({ data }) {
+        this.json_data = data.organization.membersWithRole.edges
+      },
+
       error (error) {
         this.setAlert({
           status : true,
@@ -100,6 +116,23 @@ export default {
   data() {
     return {
       organization: [],
+
+      json_fields: {
+        Login: "node.login",
+        Name: "node.name",
+        Email: "node.email",
+        OrgsEmail: "node.organizationVerifiedDomainEmails"
+
+      },
+      json_data: [],
+      json_meta: [
+        [
+          {
+            key: "charset",
+            value: "utf-8",
+          },
+        ],
+      ],
 
       pilihOrgs: 'sepulsa',
       jenisOrgs: [
@@ -148,6 +181,9 @@ export default {
       ],
 
     }
+  },
+  components: {
+
   },
   computed: {
     // ...mapGetters({
